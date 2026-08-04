@@ -1,0 +1,71 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: amis-postgres
+    environment:
+      POSTGRES_DB: amisdb
+      POSTGRES_USER: amis
+      POSTGRES_PASSWORD: amis123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U amis -d amisdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - amis-network
+
+  backend:
+    build:
+      context: ./backend-django
+      dockerfile: Dockerfile
+    container_name: amis-backend-django
+    environment:
+      DEBUG: "False"
+      SECRET_KEY: "amis-secret-key-1234567890-abcdefghijklmnop"
+      DB_ENGINE: "django.db.backends.postgresql"
+      DB_NAME: "amisdb"
+      DB_USER: "amis"
+      DB_PASSWORD: "amis123"
+      DB_HOST: "postgres"
+      DB_PORT: "5432"
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend-django:/app
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py createsuperuser --noinput --username admin --email admin@amis.edu || true &&
+             gunicorn --bind 0.0.0.0:8080 --workers 4 amis.wsgi:application"
+    networks:
+      - amis-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: amis-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_API_URL: "http://localhost:8080/api"
+    depends_on:
+      - backend
+    networks:
+      - amis-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  amis-network:
+    driver: bridge
