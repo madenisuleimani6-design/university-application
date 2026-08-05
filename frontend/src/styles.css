@@ -68,3 +68,22 @@ a:hover {
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+.login-page {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.login-header {
+  background: #fff;
+  border-bottom: 3px solid #2d5016;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.login-logo {
+  height: 70px;
+  width: auto;
+  object-fit: contain;
+}

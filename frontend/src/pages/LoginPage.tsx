@@ -31,12 +31,20 @@ function LoginPage() {
   };
 
   return (
-    <div className="container py-5">
-      <div className="row justify-content-center">
-        <div className="col-md-6 col-lg-5">
-          <div className="card shadow-sm border-0">
-            <div className="card-body p-4">
-              <h3 className="fw-bold text-primary mb-3">AMIS Login</h3>
+    <div className="login-page">
+      <div className="login-header">
+        <img
+          src="/images/ardhi-logo.png"
+          alt="Ardhi University"
+          className="login-logo"
+        />
+      </div>
+      <div className="container py-4">
+        <div className="row justify-content-center">
+          <div className="col-md-6 col-lg-5">
+            <div className="card shadow-sm border-0">
+              <div className="card-body p-4">
+                <h3 className="fw-bold text-primary mb-3">AMIS Login</h3>
               <p className="text-muted">Secure access to academic and administrative services.</p>
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
@@ -56,6 +64,7 @@ function LoginPage() {
                   {loading ? 'Signing in...' : 'Sign In'}
                 </button>
               </form>
+              </div>
             </div>
           </div>
         </div>
