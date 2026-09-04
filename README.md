@@ -76,6 +76,8 @@ docker compose -f docker-compose-django.yml up --build
 
 - **Admin Username:** admin
 - **Admin Password:** admin123
+- **Student Username:** student
+- **Student Password:** student123
 - **Role:** Administrator
 
 ---
