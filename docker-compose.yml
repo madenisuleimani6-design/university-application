@@ -31,8 +31,35 @@ services:
       SPRING_DATASOURCE_USERNAME: amis
       SPRING_DATASOURCE_PASSWORD: amis123
       JWT_SECRET: amis-secret-key-1234567890-abcdefghijklmnop
+      APP_CORS_ALLOWED_ORIGINS: http://localhost:3000,http://127.0.0.1:3000,http://192.168.1.*:3000
     ports:
       - "8080:8080"
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: amis-frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: amis-caddy
+    depends_on:
+      - frontend
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
 volumes:
   postgres_data:
+  caddy_data:
+  caddy_config:

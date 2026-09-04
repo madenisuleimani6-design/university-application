@@ -6,3 +6,4 @@ build/
 *.log
 /backend/target/
 *.tsbuildinfo
+/frontend/certs/

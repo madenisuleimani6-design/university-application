@@ -48,5 +48,6 @@ com\example\amis\repository\ResultRepository.class
 com\example\amis\dto\ElectionDtos$CandidateView.class
 com\example\amis\dto\ElectionRequests$CreateElection.class
 com\example\amis\entity\Registration.class
+com\example\amis\configuration\DemoDataInitializer.class
 com\example\amis\controller\ElectionController$StatusRequest.class
 com\example\amis\controller\AccommodationController.class
