@@ -1,0 +1,97 @@
+.election-page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-bottom: 36px;
+}
+
+.election-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28px 32px;
+  margin-bottom: 20px;
+  color: #fff;
+  background: linear-gradient(110deg, #003d82, #1767a5 62%, #ee7918);
+  border-radius: 8px;
+  box-shadow: 0 8px 22px rgba(0, 61, 130, .18);
+}
+
+.election-heading h1 { color: #fff; margin: 4px 0 8px; font-size: 30px; }
+.election-heading p:not(.eyebrow) { max-width: 660px; opacity: .88; }
+.eyebrow, .section-label { color: #dd6b16; font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.election-heading .eyebrow { color: #ffd49e; }
+.election-shield { font-size: 64px; opacity: .28; margin-right: 16px; }
+.election-alert { padding: 12px 16px; margin-bottom: 14px; border-radius: 5px; font-size: 14px; }
+.election-alert-success { color: #155724; background: #e0f3e7; border: 1px solid #b9dfc5; }
+.election-alert-error { color: #842029; background: #fbe4e7; border: 1px solid #f1bbc1; }
+.election-admin-create, .election-card { background: #fff; border: 1px solid #e1e8ee; border-radius: 7px; box-shadow: 0 3px 14px rgba(18, 43, 66, .07); }
+.election-admin-create { padding: 22px; margin-bottom: 20px; }
+.election-admin-create h2 { margin: 5px 0 16px; font-size: 20px; }
+.election-create-form { display: grid; grid-template-columns: 1.2fr 1.4fr 1fr 1fr auto; gap: 10px; align-items: end; }
+.election-create-form label { display: flex; flex-direction: column; gap: 5px; color: #526274; font-size: 12px; font-weight: 700; }
+.election-create-form input, .candidate-form input, .position-form input { width: 100%; padding: 10px 11px; border: 1px solid #cbd6df; border-radius: 4px; font: inherit; font-size: 13px; }
+.election-card { margin-bottom: 22px; overflow: hidden; }
+.election-card-header { display: flex; justify-content: space-between; gap: 22px; padding: 24px 26px; background: #f7fafc; border-bottom: 1px solid #e6edf2; }
+.election-status { color: #627486; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+.status-dot { display: inline-block; width: 8px; height: 8px; margin-right: 5px; border-radius: 50%; background: #a5b1bb; }
+.status-dot-open { background: #159957; box-shadow: 0 0 0 4px #dff5e8; }
+.election-card-header h2 { margin: 8px 0 5px; font-size: 24px; color: #173b5e; }
+.election-card-header p { color: #687b8c; font-size: 14px; }
+.election-dates { display: flex; flex-direction: column; gap: 3px; min-width: 180px; padding-left: 20px; border-left: 1px solid #d9e3eb; color: #2e587c; font-size: 12px; }
+.election-dates span { color: #8c9aa5; }
+.admin-toolbar { display: flex; gap: 8px; padding: 14px 26px 0; }
+.positions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; padding: 22px 26px; }
+.position-card { padding: 17px; border: 1px solid #e3e9ee; border-radius: 5px; }
+.position-heading { display: flex; gap: 12px; align-items: center; margin-bottom: 15px; }
+.position-heading > span { display: grid; place-items: center; width: 32px; height: 32px; color: #fff; background: #ee7918; border-radius: 50%; font-size: 11px; font-weight: 800; }
+.position-heading h3 { margin: 0; color: #173b5e; font-size: 17px; }
+.position-heading small { color: #82919e; font-size: 11px; }
+.candidate-list { display: grid; gap: 8px; }
+.candidate-option { display: flex; gap: 10px; padding: 11px; border: 1px solid #e5ebef; border-radius: 4px; cursor: pointer; }
+.candidate-option:hover, .candidate-selected { background: #f0f7fd; border-color: #8db8d8; }
+.candidate-option input { accent-color: #0066a8; margin-top: 3px; }
+.candidate-option span { display: flex; flex-direction: column; gap: 3px; }
+.candidate-option strong { color: #294b68; font-size: 13px; }
+.candidate-option small { color: #788894; font-size: 11px; line-height: 1.35; }
+.election-button { padding: 9px 13px; border: 0; border-radius: 4px; color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; }
+.election-button:disabled { opacity: .45; cursor: not-allowed; }
+.election-button-primary { background: #0066a8; }
+.election-button-danger { background: #a93737; }
+.election-button-secondary { background: #5b7182; }
+.vote-button { width: 100%; margin-top: 13px; }
+.candidate-form, .position-form { display: flex; gap: 7px; margin-top: 14px; }
+.position-form { padding: 0 26px 22px; }
+.position-form input { max-width: 280px; }
+.results-footer { padding: 0 26px 18px; }
+.results-link { padding: 0; border: 0; background: none; color: #0066a8; cursor: pointer; font-size: 13px; font-weight: 700; }
+.results-panel { margin: 0 26px 24px; padding: 18px; background: #f7fafc; border-top: 3px solid #ee7918; }
+.results-panel h3 { margin: 4px 0 14px; color: #173b5e; }
+.result-row { padding: 12px 0; border-bottom: 1px solid #dce5eb; }
+.result-row:last-child { border-bottom: 0; }
+.result-row-heading, .result-candidate { display: flex; justify-content: space-between; gap: 12px; padding: 4px 0; color: #455e72; font-size: 13px; }
+.result-row-heading { color: #173b5e; }
+.result-candidate em { margin-left: 8px; color: #768895; font-style: normal; }
+.winner-line { margin: 9px 0 0; color: #b15b0d; font-size: 12px; font-weight: 700; }
+.election-empty { padding: 70px 20px; color: #738493; text-align: center; }
+.election-empty i { color: #ee7918; font-size: 36px; }
+.election-empty h2 { margin: 13px 0 6px; color: #234866; }
+.election-empty p { font-size: 14px; }
+
+@media (max-width: 900px) {
+  .election-create-form { grid-template-columns: 1fr 1fr; }
+  .election-create-form button { grid-column: 1 / -1; }
+}
+
+@media (max-width: 620px) {
+  .election-heading { padding: 22px; }
+  .election-heading h1 { font-size: 24px; }
+  .election-shield { display: none; }
+  .election-card-header { flex-direction: column; padding: 19px; }
+  .election-dates { padding: 12px 0 0; border-left: 0; border-top: 1px solid #d9e3eb; }
+  .positions-grid { padding: 17px; grid-template-columns: 1fr; }
+  .admin-toolbar, .results-footer { padding-left: 17px; padding-right: 17px; flex-wrap: wrap; }
+  .position-form { padding-left: 17px; padding-right: 17px; }
+  .candidate-form { flex-direction: column; }
+  .results-panel { margin-left: 17px; margin-right: 17px; }
+  .election-create-form { grid-template-columns: 1fr; }
+}

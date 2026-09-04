@@ -15,6 +15,7 @@ import StudentsPage from './pages/StudentsPage';
 import CoursesPage from './pages/CoursesPage';
 import FinancePage from './pages/FinancePage';
 import AccommodationPage from './pages/AccommodationPage';
+import ElectionPage from './pages/ElectionPage';
 
 function App() {
   return (
@@ -67,6 +68,7 @@ function App() {
         <Route path="courses" element={<CoursesPage />} />
         <Route path="finance" element={<FinancePage />} />
         <Route path="accommodation" element={<AccommodationPage />} />
+        <Route path="elections" element={<ElectionPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
