@@ -80,6 +80,8 @@ docker compose -f docker-compose-django.yml up --build
 - **Student Password:** student123
 - **Role:** Administrator
 
+The Java backend runs on JDK 25 and compiles application bytecode to Java 21 for compatibility with Spring Boot 3.3.4. See `LOGIN-SETUP.md` for the verified LAN login URLs.
+
 ---
 
 ## 📁 Project Structure

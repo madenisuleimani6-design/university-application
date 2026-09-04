@@ -43,7 +43,6 @@ com\example\amis\dto\ElectionDtos$PositionView.class
 com\example\amis\controller\ElectionController.class
 com\example\amis\repository\RoleRepository.class
 com\example\amis\entity\ResultRecord.class
-com\example\amis\config\SecurityConfig.class
 com\example\amis\repository\ResultRepository.class
 com\example\amis\dto\ElectionDtos$CandidateView.class
 com\example\amis\dto\ElectionRequests$CreateElection.class

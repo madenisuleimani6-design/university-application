@@ -1,7 +1,6 @@
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\AmisApplication.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\config\JwtAuthenticationFilter.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\config\JwtService.java
-D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\config\SecurityConfig.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\configuration\DemoDataInitializer.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\configuration\SecurityConfig.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\controller\AccommodationController.java
