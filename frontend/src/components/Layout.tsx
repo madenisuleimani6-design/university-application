@@ -58,6 +58,11 @@ const navItems = [
     icon: 'fas fa-vote-yea',
   },
   {
+    to: '/information',
+    label: 'Information Center',
+    icon: 'fas fa-bullhorn',
+  },
+  {
     to: '/account/change-password',
     label: 'My Account',
     icon: 'fas fa-wrench',

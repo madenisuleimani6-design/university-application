@@ -80,6 +80,31 @@ export const castElectionVote = async (electionId: number, candidateId: number) 
 export const getElectionResults = async (electionId: number) =>
   (await api.get<ElectionResult>(`/elections/${electionId}/results`)).data;
 
+export interface Announcement {
+  id: number;
+  title: string;
+  content: string;
+  category: string;
+  priority: string;
+  attachmentUrl?: string;
+  targetYear?: string;
+  targetProgramme?: string;
+  targetCourse?: string;
+  publishAt?: string;
+  expiresAt?: string;
+  published: boolean;
+  authorUsername?: string;
+  createdAt?: string;
+}
+
+export const getAnnouncements = async () => (await api.get<Announcement[]>('/announcements')).data;
+export const getManagedAnnouncements = async () => (await api.get<Announcement[]>('/announcements/manage')).data;
+export const createAnnouncement = async (payload: Omit<Announcement, 'id' | 'published' | 'authorUsername' | 'createdAt'> & { published: boolean }) =>
+  (await api.post<Announcement>('/announcements', payload)).data;
+export const setAnnouncementPublished = async (id: number, published: boolean) =>
+  (await api.patch<Announcement>(`/announcements/${id}/published`, { published })).data;
+export const deleteAnnouncement = async (id: number) => api.delete(`/announcements/${id}`);
+
 export const getStudents = async () => {
   const response = await api.get('/students');
   return response.data;

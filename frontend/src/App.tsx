@@ -16,6 +16,7 @@ import CoursesPage from './pages/CoursesPage';
 import FinancePage from './pages/FinancePage';
 import AccommodationPage from './pages/AccommodationPage';
 import ElectionPage from './pages/ElectionPage';
+import InformationCenterPage from './pages/InformationCenterPage';
 
 function App() {
   return (
@@ -69,6 +70,7 @@ function App() {
         <Route path="finance" element={<FinancePage />} />
         <Route path="accommodation" element={<AccommodationPage />} />
         <Route path="elections" element={<ElectionPage />} />
+        <Route path="information" element={<InformationCenterPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

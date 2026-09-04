@@ -4,6 +4,7 @@ D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\co
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\configuration\DemoDataInitializer.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\configuration\SecurityConfig.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\controller\AccommodationController.java
+D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\controller\AnnouncementController.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\controller\AuthController.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\controller\CourseController.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\controller\ElectionController.java
@@ -11,11 +12,14 @@ D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\co
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\controller\RegistrationController.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\controller\ResultController.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\controller\StudentController.java
+D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\dto\AnnouncementDtos.java
+D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\dto\AnnouncementRequests.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\dto\AuthResponse.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\dto\ElectionDtos.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\dto\ElectionRequests.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\dto\LoginRequest.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\entity\Accommodation.java
+D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\entity\Announcement.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\entity\Candidate.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\entity\Course.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\entity\Election.java
@@ -28,6 +32,7 @@ D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\en
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\entity\User.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\entity\Vote.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\repository\AccommodationRepository.java
+D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\repository\AnnouncementRepository.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\repository\CandidateRepository.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\repository\CourseRepository.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\repository\ElectionPositionRepository.java
@@ -39,4 +44,5 @@ D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\re
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\repository\StudentRepository.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\repository\UserRepository.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\repository\VoteRepository.java
+D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\service\AnnouncementService.java
 D:\ISM2\PROJECT\university application\backend\src\main\java\com\example\amis\service\ElectionService.java
