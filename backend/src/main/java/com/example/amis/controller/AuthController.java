@@ -32,7 +32,8 @@ public class AuthController {
         Optional<User> userOpt = userRepository.findByUsername(request.username());
         if (userOpt.isPresent() && passwordEncoder.matches(request.password(), userOpt.get().getPasswordHash())) {
             String token = jwtService.generateToken(userOpt.get().getUsername());
-            return ResponseEntity.ok(new AuthResponse(token, userOpt.get().getUsername()));
+            String role = userOpt.get().getRole() == null ? "STUDENT" : userOpt.get().getRole().getRoleName();
+            return ResponseEntity.ok(new AuthResponse(token, userOpt.get().getUsername(), role));
         }
 
         return ResponseEntity.status(401).body("Invalid credentials");

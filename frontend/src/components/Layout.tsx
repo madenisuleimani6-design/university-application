@@ -53,6 +53,11 @@ const navItems = [
     submenu: [{ to: '/academic/results', label: 'My Results' }],
   },
   {
+    to: '/elections',
+    label: 'Student Elections',
+    icon: 'fas fa-vote-yea',
+  },
+  {
     to: '/account/change-password',
     label: 'My Account',
     icon: 'fas fa-wrench',
@@ -99,6 +104,7 @@ function Layout() {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('role');
     setProfileOpen(false);
     navigate('/login');
   };
