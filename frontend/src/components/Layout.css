@@ -26,7 +26,7 @@
 }
 
 .university-banner {
-  height: 60px;
+  height: 95px;
   width: auto;
   object-fit: contain;
 }
@@ -262,7 +262,7 @@
   }
 
   .university-banner {
-    height: 48px;
+    height: 64px;
   }
 
   .user-name {
