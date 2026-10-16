@@ -17,7 +17,7 @@ This AMIS system consists of three main components:
 > [mkcert](https://github.com/FiloSottile/mkcert) if missing:
 >
 > ```bash
-> mkcert -cert-file certs/vite-cert.pem -key-file certs/vite-key.pem localhost 127.0.0.1 ::1 192.168.1.3
+> mkcert -cert-file certs/vite-cert.pem -key-file certs/vite-key.pem localhost 127.0.0.1 ::1 192.168.1.4
 > ```
 
 ---
@@ -31,7 +31,7 @@ cd frontend
 npm run dev
 ```
 
-Visit: **https://localhost:3002** (or https://192.168.1.3:3002 on your LAN)
+Visit: **https://localhost:3002** (or https://192.168.1.4:3002 on your LAN)
 
 ### Option 2: Full Stack with Django Backend
 
