@@ -8,9 +8,17 @@ A complete web-based solution for managing students, academics, finance, accommo
 
 This AMIS system consists of three main components:
 
-1. **Frontend**: React + TypeScript + Vite (Port 3000)
+1. **Frontend**: React + TypeScript + Vite (Port 3002, HTTPS)
 2. **Backend**: Django REST Framework (Port 8080)
 3. **Database**: PostgreSQL (Port 5432)
+
+> **Note:** The Vite dev server runs on **HTTPS** at port **3002** using local
+> certificates from the `certs/` folder (gitignored). Regenerate them with
+> [mkcert](https://github.com/FiloSottile/mkcert) if missing:
+>
+> ```bash
+> mkcert -cert-file certs/vite-cert.pem -key-file certs/vite-key.pem localhost 127.0.0.1 ::1 192.168.1.3
+> ```
 
 ---
 
@@ -23,7 +31,7 @@ cd frontend
 npm run dev
 ```
 
-Visit: **http://localhost:3000**
+Visit: **https://localhost:3002** (or https://192.168.1.3:3002 on your LAN)
 
 ### Option 2: Full Stack with Django Backend
 
@@ -58,7 +66,7 @@ npm run dev
 
 **Access the System:**
 
-- Frontend: **http://localhost:3000**
+- Frontend: **https://localhost:3002**
 - Backend API: **http://localhost:8080/api**
 - Django Admin: **http://localhost:8080/admin**
 
@@ -90,7 +98,7 @@ For local MySQL Workbench setup, see `MYSQL-SETUP.md`.
 
 ```
 university application/
-├── frontend/                  # React frontend (Port 3000)
+├── frontend/                  # React frontend (Port 3002, HTTPS)
 │   ├── src/
 │   │   ├── components/       # UI components
 │   │   ├── pages/            # Application pages
@@ -365,6 +373,9 @@ This will start:
 - PostgreSQL database (port 5432)
 - Django backend (port 8080)
 - React frontend (port 3000)
+
+> **Note:** The Docker setup serves the frontend on plain HTTP at port **3000**.
+> The HTTPS port **3002** setup applies to the local `npm run dev` workflow only.
 
 ### Access
 
