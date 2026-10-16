@@ -1,5 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { login } from '../services/api';
 
 function LoginPage() {
@@ -24,7 +25,13 @@ function LoginPage() {
       localStorage.setItem('token', data.token);
       navigate('/');
     } catch (err) {
-      setError('Invalid username or password.');
+      if (axios.isAxiosError(err) && !err.response) {
+        setError('The backend server is unavailable. Start Django and try again.');
+      } else if (axios.isAxiosError(err) && err.response?.status === 401) {
+        setError('Invalid username or password.');
+      } else {
+        setError('Login failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

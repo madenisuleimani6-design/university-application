@@ -1,7 +1,7 @@
 from django.contrib import admin
 from amis_app.models import (
     Role, Student, Course, Registration, 
-    ResultRecord, Payment, Accommodation
+    ResultRecord, Payment, Accommodation, Election, ElectionPosition, Candidate, Vote, Announcement
 )
 
 
@@ -56,3 +56,42 @@ class AccommodationAdmin(admin.ModelAdmin):
     list_display = ['student', 'hostel_name', 'room_number', 'allocation_date']
     search_fields = ['student__registration_number', 'hostel_name', 'room_number']
     list_filter = ['hostel_name', 'allocation_date']
+
+
+class ElectionPositionInline(admin.TabularInline):
+    model = ElectionPosition
+    extra = 0
+
+
+@admin.register(Election)
+class ElectionAdmin(admin.ModelAdmin):
+    list_display = ['title', 'starts_at', 'ends_at', 'active', 'closed']
+    list_filter = ['active', 'closed']
+    search_fields = ['title']
+    inlines = [ElectionPositionInline]
+
+
+@admin.register(ElectionPosition)
+class ElectionPositionAdmin(admin.ModelAdmin):
+    list_display = ['name', 'election', 'display_order']
+    search_fields = ['name', 'election__title']
+
+
+@admin.register(Candidate)
+class CandidateAdmin(admin.ModelAdmin):
+    list_display = ['name', 'position']
+    search_fields = ['name', 'position__name']
+
+
+@admin.register(Vote)
+class VoteAdmin(admin.ModelAdmin):
+    list_display = ['voter', 'election', 'position', 'candidate', 'voted_at']
+    list_filter = ['election', 'position']
+    search_fields = ['voter__username', 'candidate__name']
+
+
+@admin.register(Announcement)
+class AnnouncementAdmin(admin.ModelAdmin):
+    list_display = ['title', 'category', 'priority', 'published', 'publish_at', 'expires_at']
+    list_filter = ['category', 'priority', 'published']
+    search_fields = ['title', 'content']

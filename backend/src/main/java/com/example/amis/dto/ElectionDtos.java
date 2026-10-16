@@ -7,7 +7,7 @@ public final class ElectionDtos {
     private ElectionDtos() {
     }
 
-    public record CandidateView(Long id, String name, String manifesto, long votes, double percentage, boolean voted) {
+    public record CandidateView(Long id, String name, String manifesto, String photoUrl, long votes, double percentage, boolean voted) {
     }
 
     public record PositionView(Long id, String name, int displayOrder, List<CandidateView> candidates, boolean voted) {

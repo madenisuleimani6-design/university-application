@@ -19,6 +19,7 @@ public class Candidate {
 
     private String name;
     private String manifesto;
+    private String photoUrl;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "position_id")

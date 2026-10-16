@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import {
   addElectionCandidate,
   addElectionPosition,
+  assetUrl,
   castElectionVote,
   createElection,
   Election,
@@ -9,7 +10,9 @@ import {
   getElectionResults,
   getElections,
   updateElectionStatus,
+  uploadCandidatePhoto,
 } from '../services/api';
+import PieChart from '../components/PieChart';
 import './ElectionPage.css';
 
 function formatDate(value: string) {
@@ -45,6 +48,25 @@ function ElectionPage() {
   useEffect(() => {
     loadElections();
   }, []);
+
+  // Keep the live tally current for everyone viewing this page.  Polling is
+  // deliberately lightweight and also makes the count update immediately
+  // after a student casts a vote without requiring a page refresh.
+  useEffect(() => {
+    if (elections.length === 0) return;
+
+    const refreshResults = () => {
+      elections.forEach((election) => {
+        getElectionResults(election.id)
+          .then((result) => setResults((current) => ({ ...current, [election.id]: result })))
+          .catch(() => undefined);
+      });
+    };
+
+    refreshResults();
+    const timer = window.setInterval(refreshResults, 10000);
+    return () => window.clearInterval(timer);
+  }, [elections]);
 
   const handleCreateElection = async (event: FormEvent) => {
     event.preventDefault();
@@ -147,7 +169,7 @@ interface ElectionCardProps {
 function ElectionCard({ election, isAdmin, result, selectedCandidates, onSelect, onVote, onResults, onRefresh, onMessage, onError }: ElectionCardProps) {
   const open = isVotingOpen(election);
   const [positionName, setPositionName] = useState('');
-  const [candidateDraft, setCandidateDraft] = useState<Record<number, { name: string; manifesto: string }>>({});
+  const [candidateDraft, setCandidateDraft] = useState<Record<number, { name: string; manifesto: string; photo?: File }>>({});
 
   const addPosition = async (event: FormEvent) => {
     event.preventDefault();
@@ -165,9 +187,12 @@ function ElectionCard({ election, isAdmin, result, selectedCandidates, onSelect,
     event.preventDefault();
     const draft = candidateDraft[positionId] ?? { name: '', manifesto: '' };
     try {
-      await addElectionCandidate(positionId, draft);
+      const candidate = await addElectionCandidate(positionId, { name: draft.name, manifesto: draft.manifesto });
+      if (draft.photo) {
+        await uploadCandidatePhoto(candidate.id, draft.photo);
+      }
       setCandidateDraft({ ...candidateDraft, [positionId]: { name: '', manifesto: '' } });
-      onMessage('Candidate added.');
+      onMessage(draft.photo ? 'Candidate added with photo.' : 'Candidate added.');
       await onRefresh();
     } catch {
       onError('Candidate could not be added.');
@@ -210,6 +235,9 @@ function ElectionCard({ election, isAdmin, result, selectedCandidates, onSelect,
               {position.candidates.map((candidate) => (
                 <label className={`candidate-option ${selectedCandidates[position.id] === candidate.id ? 'candidate-selected' : ''}`} key={candidate.id}>
                   <input type="radio" name={`position-${position.id}`} disabled={!open || position.voted} checked={selectedCandidates[position.id] === candidate.id} onChange={() => onSelect(position.id, candidate.id)} />
+                  {candidate.photoUrl
+                    ? <img className="candidate-photo" src={assetUrl(candidate.photoUrl)} alt={candidate.name} />
+                    : <span className="candidate-photo candidate-photo-placeholder"><i className="fas fa-user" /></span>}
                   <span><strong>{candidate.name}</strong><small>{candidate.manifesto || 'No manifesto provided.'}</small></span>
                 </label>
               ))}
@@ -219,6 +247,10 @@ function ElectionCard({ election, isAdmin, result, selectedCandidates, onSelect,
               <form className="candidate-form" onSubmit={(event) => addCandidate(event, position.id)}>
                 <input required placeholder="Candidate name" value={candidateDraft[position.id]?.name ?? ''} onChange={(event) => setCandidateDraft({ ...candidateDraft, [position.id]: { ...(candidateDraft[position.id] ?? { manifesto: '' }), name: event.target.value } })} />
                 <input placeholder="Manifesto (optional)" value={candidateDraft[position.id]?.manifesto ?? ''} onChange={(event) => setCandidateDraft({ ...candidateDraft, [position.id]: { ...(candidateDraft[position.id] ?? { name: '' }), manifesto: event.target.value } })} />
+                <label className="candidate-photo-input">
+                  <i className="fas fa-camera" /> {candidateDraft[position.id]?.photo ? candidateDraft[position.id].photo!.name : 'Attach photo (optional)'}
+                  <input type="file" accept="image/*" key={candidateDraft[position.id]?.photo?.name ?? 'empty'} onChange={(event) => setCandidateDraft({ ...candidateDraft, [position.id]: { ...(candidateDraft[position.id] ?? { name: '', manifesto: '' }), photo: event.target.files?.[0] } })} />
+                </label>
                 <button className="election-button election-button-secondary">Add candidate</button>
               </form>
             )}
@@ -227,14 +259,42 @@ function ElectionCard({ election, isAdmin, result, selectedCandidates, onSelect,
       </div>
 
       {isAdmin && !election.closed && <form className="position-form" onSubmit={addPosition}><input required placeholder="New leadership position" value={positionName} onChange={(event) => setPositionName(event.target.value)} /><button className="election-button election-button-secondary">Add position</button></form>}
-      <div className="results-footer"><button className="results-link" onClick={() => onResults(election.id)}><i className="fas fa-chart-bar" /> {election.closed ? 'View final results' : 'View current results'}</button></div>
+      <div className="results-footer"><button className="results-link" onClick={() => onResults(election.id)}><i className="fas fa-chart-bar" /> {election.closed ? 'Refresh final results' : 'Refresh live results'}</button><small>Results refresh automatically every 10 seconds.</small></div>
       {result && <ResultsPanel result={result} final={election.closed} />}
     </article>
   );
 }
 
 function ResultsPanel({ result, final }: { result: ElectionResult; final: boolean }) {
-  return <section className="results-panel"><div className="section-label">{final ? 'Official result' : 'Live count'}</div><h3>{final ? 'Final winners' : 'Current results'}</h3>{result.positions.map((position) => <div className="result-row" key={position.position}><div className="result-row-heading"><strong>{position.position}</strong><span>{position.totalVotes} votes</span></div>{position.candidates.map((candidate) => <div className="result-candidate" key={candidate.id}><span>{candidate.name}</span><span>{candidate.votes} <em>{candidate.percentage.toFixed(1)}%</em></span></div>)}{position.winner && <p className="winner-line"><i className="fas fa-trophy" /> {final ? 'Winner' : 'Leading'}: {position.winner.name}</p>}</div>)}</section>;
+  return (
+    <section className="results-panel">
+      <div className="section-label">{final ? 'Official result' : 'Live count'}</div>
+      <h3>{final ? 'Final winners' : 'Current results'}</h3>
+      {result.positions.map((position) => (
+        <div className="result-row" key={position.position}>
+          <div className="result-row-heading"><strong>{position.position}</strong><span>{position.totalVotes} votes</span></div>
+          <PieChart data={position.candidates.map((candidate) => ({ label: candidate.name, value: candidate.votes }))} />
+          {position.candidates.map((candidate) => (
+            <div className="result-candidate" key={candidate.id}>
+              <div className="result-candidate-name"><span>{candidate.name}</span><div className="result-progress"><i style={{ width: `${candidate.percentage}%` }} /></div></div>
+              <span>{candidate.votes} <em>{candidate.percentage.toFixed(1)}%</em></span>
+            </div>
+          ))}
+          {position.winner && (
+            <div className="winner-card">
+              {position.winner.photoUrl
+                ? <img className="winner-photo" src={assetUrl(position.winner.photoUrl)} alt={position.winner.name} />
+                : <span className="winner-photo winner-photo-placeholder"><i className="fas fa-trophy" /></span>}
+              <div className="winner-card-body">
+                <p className="winner-line"><i className="fas fa-trophy" /> {final ? 'Winner' : 'Leading'}: {position.winner.name} — {position.winner.percentage.toFixed(1)}%</p>
+                <small>{position.winner.votes} of {position.totalVotes} votes</small>
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
+    </section>
+  );
 }
 
 export default ElectionPage;

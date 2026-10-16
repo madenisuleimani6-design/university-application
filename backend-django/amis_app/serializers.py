@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from amis_app.models import (
     Role, Student, Course, Registration, 
-    ResultRecord, Payment, Accommodation
+    ResultRecord, Payment, Accommodation, Announcement
 )
 
 
@@ -76,3 +76,21 @@ class AccommodationSerializer(serializers.ModelSerializer):
         fields = ['id', 'student', 'student_detail', 'hostel_name', 
                   'room_number', 'allocation_date']
         read_only_fields = ['allocation_date']
+
+
+class AnnouncementSerializer(serializers.ModelSerializer):
+    authorUsername = serializers.CharField(source='author_username', read_only=True)
+    attachmentUrl = serializers.CharField(source='attachment_url', required=False, allow_blank=True)
+    targetYear = serializers.CharField(source='target_year', required=False, allow_blank=True)
+    targetProgramme = serializers.CharField(source='target_programme', required=False, allow_blank=True)
+    targetCourse = serializers.CharField(source='target_course', required=False, allow_blank=True)
+    publishAt = serializers.DateTimeField(source='publish_at', required=False)
+    expiresAt = serializers.DateTimeField(source='expires_at', required=False, allow_null=True)
+    createdAt = serializers.DateTimeField(source='created_at', read_only=True)
+
+    class Meta:
+        model = Announcement
+        fields = ['id', 'title', 'content', 'category', 'priority', 'attachmentUrl',
+                  'targetYear', 'targetProgramme', 'targetCourse', 'publishAt', 'expiresAt',
+                  'published', 'authorUsername', 'createdAt']
+        read_only_fields = ['authorUsername', 'createdAt']

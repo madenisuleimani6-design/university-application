@@ -1,11 +1,13 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import {
   Announcement,
+  assetUrl,
   createAnnouncement,
   deleteAnnouncement,
   getAnnouncements,
   getManagedAnnouncements,
   setAnnouncementPublished,
+  uploadAnnouncementAttachment,
 } from '../services/api';
 import './InformationCenterPage.css';
 
@@ -21,12 +23,50 @@ const categories: { key: Category; label: string; icon: string }[] = [
 ];
 
 const emptyDraft = {
-  title: '', content: '', category: 'UNIVERSITY', priority: 'NORMAL', attachmentUrl: '',
+  title: '', content: '', category: 'UNIVERSITY', priority: 'NORMAL',
   targetYear: '', targetProgramme: '', targetCourse: '', publishAt: '', expiresAt: '', published: true,
 };
 
+const acceptTypes = '.pdf,.png,.jpg,.jpeg,.gif,.webp,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip';
+const imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp'];
+
 function formatDate(value?: string) {
   return value ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : 'Now';
+}
+
+function attachmentHref(url: string) {
+  return /^https?:\/\//i.test(url) ? url : `https://${url}`;
+}
+
+function AttachmentViewer({ item }: { item: Announcement }) {
+  const url = item.attachmentUrl ?? '';
+  const fileSrc = url.startsWith('/uploads/') ? url : assetUrl(url);
+  return (
+    <div className="attachment-viewer">
+      <div className="attachment-message">
+        <h4>{item.title}</h4>
+        <p>{item.content}</p>
+        {item.authorUsername && <small>Imetumwa na: {item.authorUsername}</small>}
+      </div>
+      {!url ? <p className="attachment-empty">Hakuna faili iliyowekwa kwenye taarifa hii.</p> :
+        url.startsWith('/uploads/') ? (() => {
+          const extension = url.split('.').pop()?.toLowerCase() ?? '';
+          if (imageExtensions.includes(extension)) return <img src={fileSrc} alt="Attachment preview" />;
+          if (extension === 'pdf') return <iframe src={fileSrc} title="Attachment preview" />;
+          return (
+            <div className="attachment-download">
+              <i className="fas fa-file-download" />
+              <a href={fileSrc} download>Download attachment</a>
+            </div>
+          );
+        })() : (
+          <div className="attachment-external">
+            <p>External link — it opens outside AMIS.</p>
+            <a className="attachment-link" href={attachmentHref(url)} target="_blank" rel="noreferrer">Open external link <i className="fas fa-external-link-alt" /></a>
+          </div>
+        )}
+    </div>
+  );
 }
 
 export default function InformationCenterPage() {
@@ -34,9 +74,12 @@ export default function InformationCenterPage() {
   const [items, setItems] = useState<Announcement[]>([]);
   const [category, setCategory] = useState<Category>('ALL');
   const [draft, setDraft] = useState(emptyDraft);
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
+  const [openAttachment, setOpenAttachment] = useState<number | null>(null);
   const [showComposer, setShowComposer] = useState(false);
   const [notice, setNotice] = useState('');
   const [error, setError] = useState('');
+  const [saving, setSaving] = useState(false);
 
   const load = async () => {
     try {
@@ -54,14 +97,20 @@ export default function InformationCenterPage() {
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     setError('');
+    setSaving(true);
     try {
-      await createAnnouncement({ ...draft, publishAt: draft.publishAt || undefined, expiresAt: draft.expiresAt || undefined });
+      const created = await createAnnouncement({ ...draft, publishAt: draft.publishAt || undefined, expiresAt: draft.expiresAt || undefined });
+      if (attachmentFile) await uploadAnnouncementAttachment(created.id, attachmentFile);
       setDraft(emptyDraft);
+      setAttachmentFile(null);
       setShowComposer(false);
-      setNotice('Information published successfully.');
+      setNotice('Information published successfully. Students can now see it in their Student Center.');
       await load();
-    } catch {
-      setError('The announcement could not be published. Check the required fields and dates.');
+    } catch (err) {
+      const detail = (err as { response?: { data?: { detail?: string } } }).response?.data?.detail;
+      setError(detail ? `Publishing failed: ${detail}` : 'Publishing failed — check your connection and try again.');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -106,19 +155,22 @@ export default function InformationCenterPage() {
           <select value={draft.category} onChange={(event) => setDraft({ ...draft, category: event.target.value })}>{categories.slice(1).map((item) => <option key={item.key} value={item.key}>{item.label}</option>)}</select>
           <select value={draft.priority} onChange={(event) => setDraft({ ...draft, priority: event.target.value })}><option value="NORMAL">Normal priority</option><option value="IMPORTANT">Important</option><option value="URGENT">Urgent notice</option></select>
           <textarea required placeholder="Write the announcement or information here..." value={draft.content} onChange={(event) => setDraft({ ...draft, content: event.target.value })} />
-          <input placeholder="Attachment URL (optional)" value={draft.attachmentUrl} onChange={(event) => setDraft({ ...draft, attachmentUrl: event.target.value })} />
+          <label className="composer-file">Attach file (optional — opens inside the dashboard){attachmentFile && <b className="composer-file-name">{attachmentFile.name}</b>}
+            <input type="file" accept={acceptTypes} onChange={(event) => setAttachmentFile(event.target.files?.[0] ?? null)} />
+          </label>
           <input placeholder="Target programme (optional)" value={draft.targetProgramme} onChange={(event) => setDraft({ ...draft, targetProgramme: event.target.value })} />
           <input placeholder="Target year (optional)" value={draft.targetYear} onChange={(event) => setDraft({ ...draft, targetYear: event.target.value })} />
+          <input placeholder="Target course (optional)" value={draft.targetCourse} onChange={(event) => setDraft({ ...draft, targetCourse: event.target.value })} />
           <label>Publish at <input type="datetime-local" value={draft.publishAt} onChange={(event) => setDraft({ ...draft, publishAt: event.target.value })} /></label>
           <label>Expires at <input type="datetime-local" value={draft.expiresAt} onChange={(event) => setDraft({ ...draft, expiresAt: event.target.value })} /></label>
         </div>
-        <button className="information-primary-button">Publish update</button>
+        <button className="information-primary-button" disabled={saving}>{saving ? 'Publishing…' : 'Publish update'}</button>
       </form>}
 
       <main className="information-feed">
         {filteredItems.length === 0 ? <div className="information-empty"><i className="fas fa-inbox" /><h2>No updates in this section</h2><p>Published information will appear here for students.</p></div> : filteredItems.map((item) => <article className={`information-item priority-${item.priority.toLowerCase()}`} key={item.id}>
           <div className="information-item-icon"><i className={categories.find((entry) => entry.key === item.category)?.icon ?? 'fas fa-info'} /></div>
-          <div className="information-item-body"><div className="information-item-meta"><span>{item.category}</span><time>{formatDate(item.publishAt)}</time>{item.priority !== 'NORMAL' && <b>{item.priority}</b>}</div><h2>{item.title}</h2><p>{item.content}</p>{(item.targetProgramme || item.targetYear || item.targetCourse) && <small className="audience-note">For {item.targetProgramme || 'students'}{item.targetYear ? ` / Year ${item.targetYear}` : ''}{item.targetCourse ? ` / ${item.targetCourse}` : ''}</small>}{item.attachmentUrl && <a className="attachment-link" href={item.attachmentUrl} target="_blank" rel="noreferrer"><i className="fas fa-paperclip" /> View attachment</a>}</div>
+          <div className="information-item-body"><div className="information-item-meta"><span>{item.category}</span><time>{formatDate(item.publishAt)}</time>{item.priority !== 'NORMAL' && <b>{item.priority}</b>}</div><h2>{item.title}</h2><p>{item.content}</p>{(item.targetProgramme || item.targetYear || item.targetCourse) && <small className="audience-note">For {item.targetProgramme || 'students'}{item.targetYear ? ` / Year ${item.targetYear}` : ''}{item.targetCourse ? ` / ${item.targetCourse}` : ''}</small>}{item.attachmentUrl && <button type="button" className="attachment-link as-button" onClick={() => setOpenAttachment(openAttachment === item.id ? null : item.id)}><i className="fas fa-paperclip" /> {openAttachment === item.id ? 'Hide attachment' : 'View attachment'}</button>}{openAttachment === item.id && <AttachmentViewer item={item} />}</div>
           {isStaff && <div className="information-item-actions"><button onClick={() => togglePublished(item)}>{item.published ? 'Unpublish' : 'Publish'}</button>{localStorage.getItem('role') === 'ADMIN' && <button onClick={() => remove(item)}>Delete</button>}</div>}
         </article>)}
       </main>

@@ -4,14 +4,20 @@ Django settings for AMIS project.
 import os
 from pathlib import Path
 from datetime import timedelta
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / '.env')
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'amis-secret-key-1234567890-abcdefghijklmnop')
 
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ['*']
+
+# SAMEORIGIN allows the dashboard to embed uploaded PDFs/images inline;
+# DENY (the install default) made Chrome refuse every inline attachment iframe.
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -59,12 +65,12 @@ WSGI_APPLICATION = 'amis.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': os.environ.get('DB_ENGINE', 'django.db.backends.mysql'),
         'NAME': os.environ.get('DB_NAME', 'amisdb'),
-        'USER': os.environ.get('DB_USER', 'amis'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'amis123'),
+        'USER': os.environ.get('DB_USER', 'root'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
         'HOST': os.environ.get('DB_HOST', 'localhost'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
+        'PORT': os.environ.get('DB_PORT', '3306'),
     }
 }
 
@@ -81,6 +87,9 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
+
+MEDIA_URL = '/uploads/'
+MEDIA_ROOT = BASE_DIR / 'uploads'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -106,6 +115,9 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://localhost:5000',
     'http://127.0.0.1:3000',
+]
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r'^https?://192\.168\.\d+\.\d+:3000$',
 ]
 
 CORS_ALLOW_CREDENTIALS = True

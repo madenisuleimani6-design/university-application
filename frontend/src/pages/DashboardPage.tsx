@@ -1,15 +1,19 @@
 import { useEffect, useState } from 'react';
-import { getCourses, getStudents } from '../services/api';
+import { getCourses, getStudents, getAnnouncements, Announcement } from '../services/api';
 import '../styles/dashboard.css';
 
 function DashboardPage() {
   const [courseCount, setCourseCount] = useState(0);
+  const [updates, setUpdates] = useState<Announcement[]>([]);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const [, courses] = await Promise.all([getStudents(), getCourses()]);
-        setCourseCount(courses.length);
+        const [, courses, announcements] = await Promise.all([getStudents(), getCourses(), getAnnouncements()]);
+        // Django paginates list endpoints ({count, results}); the Java backend returns plain arrays.
+        const courseList = Array.isArray(courses) ? courses : (courses?.results ?? []);
+        setCourseCount(courseList.length);
+        setUpdates((Array.isArray(announcements) ? announcements : []).slice(0, 5));
       } catch (error) {
         console.error(error);
       }
@@ -20,10 +24,11 @@ function DashboardPage() {
 
   return (
     <div className="dashboard-container">
-      {/* Academic Year Alert */}
+      {/* Welcome Banner */}
       <div className="alert alert-info mb-4">
-        <i className="fas fa-info-circle"></i>
-        <strong>The current academic year is 2025/26</strong>
+        <i className="fas fa-hand-paper"></i>
+        <strong>Welcome To AMIS (Ardhi University)</strong>
+        <span className="welcome-year">The current academic year is 2025/26</span>
       </div>
 
       {/* Stats Cards */}
@@ -60,7 +65,7 @@ function DashboardPage() {
           <h3 className="card-title">PROFILE SUMMARY</h3>
           <div className="profile-content">
             <div className="profile-avatar-large">
-              <img src="https://via.placeholder.com/120" alt="Student" />
+              <i className="fas fa-user"></i>
             </div>
             <div className="profile-info">
               <h4>SULEIMANI MAULID MADENI</h4>
@@ -105,18 +110,13 @@ function DashboardPage() {
       <div className="dashboard-card">
         <h3 className="card-title">RECENT UPDATES</h3>
         <div className="updates-list">
-          <div className="update-item">
-            <span className="update-date">2025-08-04</span>
-            <span className="update-text">Registration verified by department</span>
-          </div>
-          <div className="update-item">
-            <span className="update-date">2025-08-01</span>
-            <span className="update-text">Course registration completed</span>
-          </div>
-          <div className="update-item">
-            <span className="update-date">2025-07-28</span>
-            <span className="update-text">Academic year 2025/26 started</span>
-          </div>
+          {updates.length === 0 && <div className="update-item"><span className="update-text">No new updates from the university right now.</span></div>}
+          {updates.map((item) => (
+            <a className="update-item" key={item.id} href="/information">
+              <span className="update-date">{item.publishAt ? new Date(item.publishAt).toISOString().slice(0, 10) : 'Today'}</span>
+              <span className="update-text">{item.title}{item.priority !== 'NORMAL' ? ` — ${item.priority}` : ''}</span>
+            </a>
+          ))}
         </div>
       </div>
     </div>

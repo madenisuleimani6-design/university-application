@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -51,6 +53,13 @@ public class ElectionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(electionService.addCandidate(positionId, request));
     }
 
+    @PostMapping("/candidates/{candidateId}/photo")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ElectionDtos.CandidateView uploadCandidatePhoto(@PathVariable Long candidateId,
+                                                           @RequestParam("photo") MultipartFile photo) {
+        return electionService.uploadCandidatePhoto(candidateId, photo);
+    }
+
     @PatchMapping("/{electionId}/status")
     @PreAuthorize("hasRole('ADMIN')")
     public ElectionDtos.ElectionView setStatus(@PathVariable Long electionId, @RequestBody StatusRequest request) {
@@ -58,6 +67,7 @@ public class ElectionController {
     }
 
     @PostMapping("/{electionId}/votes")
+    @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<Void> vote(@PathVariable Long electionId,
                                      @RequestBody ElectionRequests.CastVote request,
                                      Authentication authentication) {

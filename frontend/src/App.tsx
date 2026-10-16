@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import LoginPage from './pages/LoginPage';
@@ -18,11 +19,29 @@ import AccommodationPage from './pages/AccommodationPage';
 import ElectionPage from './pages/ElectionPage';
 import InformationCenterPage from './pages/InformationCenterPage';
 
+function hasValidToken() {
+  const token = localStorage.getItem('token');
+  if (!token) return false;
+
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return typeof payload.exp !== 'number' || payload.exp * 1000 > Date.now();
+  } catch {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    return false;
+  }
+}
+
+function ProtectedRoute({ children }: { children: ReactNode }) {
+  return hasValidToken() ? children : <Navigate to="/login" replace />;
+}
+
 function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/" element={<Layout />}>
+      <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         <Route index element={<DashboardPage />} />
 
         {/* Registration - 10 steps */}

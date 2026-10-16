@@ -16,7 +16,7 @@ api.interceptors.request.use((config) => {
 });
 
 export const login = async (username: string, password: string) => {
-  const response = await api.post('/auth/login', { username, password });
+  const response = await api.post('/auth/login/', { username, password });
   localStorage.setItem('role', response.data.role ?? 'STUDENT');
   return response.data;
 };
@@ -25,6 +25,7 @@ export interface ElectionCandidate {
   id: number;
   name: string;
   manifesto?: string;
+  photoUrl?: string;
   votes: number;
   percentage: number;
   voted: boolean;
@@ -60,25 +61,34 @@ export interface ElectionResult {
   }[];
 }
 
-export const getElections = async () => (await api.get<Election[]>('/elections')).data;
+export const getElections = async () => (await api.get<Election[]>('/elections/')).data;
 
 export const createElection = async (payload: { title: string; description: string; startsAt: string; endsAt: string }) =>
-  (await api.post<Election>('/elections', payload)).data;
+  (await api.post<Election>('/elections/', payload)).data;
 
 export const addElectionPosition = async (electionId: number, payload: { name: string; displayOrder: number }) =>
-  (await api.post<ElectionPosition>(`/elections/${electionId}/positions`, payload)).data;
+  (await api.post<ElectionPosition>(`/elections/${electionId}/positions/`, payload)).data;
 
 export const addElectionCandidate = async (positionId: number, payload: { name: string; manifesto: string }) =>
-  (await api.post<ElectionCandidate>(`/elections/positions/${positionId}/candidates`, payload)).data;
+  (await api.post<ElectionCandidate>(`/elections/positions/${positionId}/candidates/`, payload)).data;
+
+export const uploadCandidatePhoto = async (candidateId: number, file: File) => {
+  const formData = new FormData();
+  formData.append('photo', file);
+  return (await api.post<ElectionCandidate>(`/elections/candidates/${candidateId}/photo/`, formData)).data;
+};
+
+export const assetUrl = (path?: string) =>
+  path ? `${apiBaseUrl.replace(/\/api\/?$/, '')}${path}` : undefined;
 
 export const updateElectionStatus = async (electionId: number, payload: { active: boolean; closed: boolean }) =>
-  (await api.patch<Election>(`/elections/${electionId}/status`, payload)).data;
+  (await api.patch<Election>(`/elections/${electionId}/status/`, payload)).data;
 
 export const castElectionVote = async (electionId: number, candidateId: number) =>
-  api.post(`/elections/${electionId}/votes`, { candidateId });
+  api.post(`/elections/${electionId}/votes/`, { candidateId });
 
 export const getElectionResults = async (electionId: number) =>
-  (await api.get<ElectionResult>(`/elections/${electionId}/results`)).data;
+  (await api.get<ElectionResult>(`/elections/${electionId}/results/`)).data;
 
 export interface Announcement {
   id: number;
@@ -97,13 +107,19 @@ export interface Announcement {
   createdAt?: string;
 }
 
-export const getAnnouncements = async () => (await api.get<Announcement[]>('/announcements')).data;
-export const getManagedAnnouncements = async () => (await api.get<Announcement[]>('/announcements/manage')).data;
+export const getAnnouncements = async () => (await api.get<Announcement[]>('/announcements/')).data;
+export const getManagedAnnouncements = async () => (await api.get<Announcement[]>('/announcements/manage/')).data;
 export const createAnnouncement = async (payload: Omit<Announcement, 'id' | 'published' | 'authorUsername' | 'createdAt'> & { published: boolean }) =>
-  (await api.post<Announcement>('/announcements', payload)).data;
+  (await api.post<Announcement>('/announcements/', payload)).data;
+
+export const uploadAnnouncementAttachment = async (id: number, file: File) => {
+  const formData = new FormData();
+  formData.append('attachment', file);
+  return (await api.post<{ id: number; attachmentUrl: string }>(`/announcements/${id}/attachment/`, formData)).data;
+};
 export const setAnnouncementPublished = async (id: number, published: boolean) =>
-  (await api.patch<Announcement>(`/announcements/${id}/published`, { published })).data;
-export const deleteAnnouncement = async (id: number) => api.delete(`/announcements/${id}`);
+  (await api.patch<Announcement>(`/announcements/${id}/published/`, { published })).data;
+export const deleteAnnouncement = async (id: number) => api.delete(`/announcements/${id}/`);
 
 export const getStudents = async () => {
   const response = await api.get('/students');

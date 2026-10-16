@@ -15,6 +15,7 @@ import com.example.amis.repository.VoteRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -31,17 +32,20 @@ public class ElectionService {
     private final CandidateRepository candidateRepository;
     private final VoteRepository voteRepository;
     private final UserRepository userRepository;
+    private final FileStorageService fileStorageService;
 
     public ElectionService(ElectionRepository electionRepository,
                            ElectionPositionRepository positionRepository,
                            CandidateRepository candidateRepository,
                            VoteRepository voteRepository,
-                           UserRepository userRepository) {
+                           UserRepository userRepository,
+                           FileStorageService fileStorageService) {
         this.electionRepository = electionRepository;
         this.positionRepository = positionRepository;
         this.candidateRepository = candidateRepository;
         this.voteRepository = voteRepository;
         this.userRepository = userRepository;
+        this.fileStorageService = fileStorageService;
     }
 
     @Transactional(readOnly = true)
@@ -68,8 +72,8 @@ public class ElectionService {
     @Transactional
     public ElectionDtos.PositionView addPosition(Long electionId, ElectionRequests.CreatePosition request) {
         Election election = findElection(electionId);
-        if (election.isClosed()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "A closed election cannot be changed");
+        if (election.isClosed() || election.isActive()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Positions cannot be changed after an election is activated or closed");
         }
         ElectionPosition position = new ElectionPosition();
         position.setElection(election);
@@ -81,13 +85,21 @@ public class ElectionService {
     @Transactional
     public ElectionDtos.CandidateView addCandidate(Long positionId, ElectionRequests.CreateCandidate request) {
         ElectionPosition position = findPosition(positionId);
-        if (position.getElection().isClosed()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "A closed election cannot be changed");
+        if (position.getElection().isClosed() || position.getElection().isActive()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Candidates cannot be changed after an election is activated or closed");
         }
         Candidate candidate = new Candidate();
         candidate.setPosition(position);
         candidate.setName(required(request.name(), "Candidate name"));
         candidate.setManifesto(request.manifesto());
+        return toCandidateView(candidateRepository.save(candidate), Map.of(), Set.of());
+    }
+
+    @Transactional
+    public ElectionDtos.CandidateView uploadCandidatePhoto(Long candidateId, MultipartFile photo) {
+        Candidate candidate = candidateRepository.findById(candidateId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Candidate not found"));
+        candidate.setPhotoUrl(fileStorageService.storeCandidatePhoto(photo, candidateId));
         return toCandidateView(candidateRepository.save(candidate), Map.of(), Set.of());
     }
 
@@ -98,6 +110,9 @@ public class ElectionService {
             election.setClosed(true);
             election.setActive(false);
         } else {
+            if (active && (election.getPositions().isEmpty() || election.getPositions().stream().anyMatch(position -> position.getCandidates().isEmpty()))) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Add at least one position and one candidate for every position before activating the election");
+            }
             election.setActive(active);
         }
         return toView(electionRepository.save(election), null);
@@ -148,7 +163,7 @@ public class ElectionService {
                     long total = candidates.stream().mapToLong(ElectionDtos.CandidateView::votes).sum();
                     List<ElectionDtos.CandidateView> withPercentages = candidates.stream()
                             .map(candidate -> new ElectionDtos.CandidateView(candidate.id(), candidate.name(), candidate.manifesto(),
-                                    candidate.votes(), total == 0 ? 0 : candidate.votes() * 100.0 / total, false))
+                                    candidate.photoUrl(), candidate.votes(), total == 0 ? 0 : candidate.votes() * 100.0 / total, false))
                             .toList();
                     return new ElectionDtos.PositionResult(position.getName(), total, withPercentages.isEmpty() ? null : withPercentages.get(0), withPercentages);
                 }).toList();
@@ -176,7 +191,8 @@ public class ElectionService {
     }
 
     private ElectionDtos.CandidateView toCandidateView(Candidate candidate, Map<Long, Long> counts, Set<Long> votedPositions) {
-        return new ElectionDtos.CandidateView(candidate.getId(), candidate.getName(), candidate.getManifesto(), counts.getOrDefault(candidate.getId(), 0L), 0, false);
+        return new ElectionDtos.CandidateView(candidate.getId(), candidate.getName(), candidate.getManifesto(),
+                candidate.getPhotoUrl(), counts.getOrDefault(candidate.getId(), 0L), 0, false);
     }
 
     private User findUser(String username) {

@@ -5,5 +5,10 @@ build/
 .idea/
 *.log
 /backend/target/
+/backend/uploads/
 *.tsbuildinfo
 /frontend/certs/
+/certs/
+backend-django/uploads/
+/backend-django/uploads/
+vibe_images/

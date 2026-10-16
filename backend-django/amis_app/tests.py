@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from amis_app.models import Student, Course, Registration, ResultRecord, Payment, Accommodation
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.utils import timezone
+from datetime import timedelta
 
 
 class AuthenticationTestCase(TestCase):
@@ -110,3 +112,38 @@ class CourseTestCase(TestCase):
         }
         response = self.client.post('/api/courses/', data)
         self.assertEqual(response.status_code, 201)
+
+
+class ElectionAndInformationTestCase(TestCase):
+    def setUp(self):
+        self.admin = User.objects.create_user(username='admin-test', password='admin-pass', is_staff=True)
+        self.student = User.objects.create_user(username='student-test', password='student-pass')
+        self.admin_client = APIClient()
+        self.admin_client.credentials(HTTP_AUTHORIZATION=f'Bearer {RefreshToken.for_user(self.admin).access_token}')
+        self.student_client = APIClient()
+        self.student_client.credentials(HTTP_AUTHORIZATION=f'Bearer {RefreshToken.for_user(self.student).access_token}')
+
+    def test_admin_can_publish_information_and_run_an_election(self):
+        announcement = self.admin_client.post('/api/announcements/', {
+            'title': 'Voting is open', 'content': 'Please vote today.', 'category': 'ELECTION', 'priority': 'IMPORTANT', 'published': True,
+        }, format='json')
+        self.assertEqual(announcement.status_code, 201)
+        self.assertEqual(self.student_client.get('/api/announcements/').status_code, 200)
+
+        now = timezone.now()
+        election = self.admin_client.post('/api/elections/', {
+            'title': 'Student Leaders', 'description': 'Annual election',
+            'startsAt': (now - timedelta(minutes=1)).isoformat(),
+            'endsAt': (now + timedelta(hours=1)).isoformat(),
+        }, format='json')
+        self.assertEqual(election.status_code, 201)
+        election_id = election.data['id']
+        position = self.admin_client.post(f'/api/elections/{election_id}/positions/', {'name': 'President', 'displayOrder': 1}, format='json')
+        self.assertEqual(position.status_code, 201)
+        candidate = self.admin_client.post(f'/api/elections/positions/{position.data["id"]}/candidates/', {'name': 'Asha Juma', 'manifesto': 'Service first'}, format='json')
+        self.assertEqual(candidate.status_code, 201)
+        self.assertEqual(self.admin_client.patch(f'/api/elections/{election_id}/status/', {'active': True, 'closed': False}, format='json').status_code, 200)
+        self.assertEqual(self.student_client.post(f'/api/elections/{election_id}/votes/', {'candidateId': candidate.data['id']}, format='json').status_code, 204)
+        results = self.student_client.get(f'/api/elections/{election_id}/results/')
+        self.assertEqual(results.status_code, 200)
+        self.assertEqual(results.data['positions'][0]['candidates'][0]['percentage'], 100)
