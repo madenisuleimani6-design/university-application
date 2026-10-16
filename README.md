@@ -4,6 +4,28 @@
 
 A complete web-based solution for managing students, academics, finance, accommodation, and administration with professional UI matching enterprise university standards.
 
+## 📸 Screenshots
+
+| Dashboard | Student Elections |
+| :---: | :---: |
+| ![Dashboard](docs/screenshots/dashboard.png) | ![Student Elections](docs/screenshots/elections.png) |
+
+| Information Center | Registration Wizard |
+| :---: | :---: |
+| ![Information Center](docs/screenshots/information-center.png) | ![Registration](docs/screenshots/registration.png) |
+
+## 📋 Table of Contents
+
+- [🚀 Quick Start](#-quick-start) — local dev, full stack, Docker
+- [📁 Project Structure](#-project-structure)
+- [🎨 Frontend Features](#-frontend-features) — pages & routes
+- [🔧 Backend API](#-backend-api) — models & endpoints
+- [🔐 Authentication & Security](#-authentication--security)
+- [🛠️ Installation & Setup](#️-installation--setup)
+- [🐳 Docker Deployment](#-docker-deployment)
+- [📊 Admin Panel](#-admin-panel)
+- [🎯 Branding](#-color-scheme--branding) · [📚 Documentation](#-documentation) · [🚨 Troubleshooting](#-troubleshooting)
+
 ## 🎓 System Overview
 
 This AMIS system consists of three main components:
