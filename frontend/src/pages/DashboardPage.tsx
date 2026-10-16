@@ -91,18 +91,18 @@ function DashboardPage() {
           <h3 className="card-title">REGISTRATION VERIFICATION</h3>
           <div className="verification-steps">
             <div className="v-step">
-              <div className="v-dot"><i className="fas fa-check"></i></div>
-              <p className="v-label">BURSAR VERIFICATION (UNDERGRADUATE)</p>
+              <div className="v-dot"></div>
+              <p className="v-label">BURSAR VERIFICATION (UNDERGRADUATE) <i className="fas fa-check"></i></p>
             </div>
             <div className="v-line"></div>
             <div className="v-step">
-              <div className="v-dot"><i className="fas fa-check"></i></div>
-              <p className="v-label">HEAD OF DEPARTMENT VERIFICATION (UNDERGRADUATE)</p>
+              <div className="v-dot"></div>
+              <p className="v-label">HEAD OF DEPARTMENT VERIFICATION (UNDERGRADUATE) <i className="fas fa-check"></i></p>
             </div>
             <div className="v-line"></div>
             <div className="v-step">
-              <div className="v-dot"><i className="fas fa-check"></i></div>
-              <p className="v-label">DIRECTOR OF UNDERGRADUATE PROGRAMS VERIFICATION</p>
+              <div className="v-dot"></div>
+              <p className="v-label">DIRECTOR OF UNDERGRADUATE PROGRAMS VERIFICATION <i className="fas fa-check"></i></p>
             </div>
           </div>
         </div>
