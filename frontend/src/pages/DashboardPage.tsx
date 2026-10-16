@@ -1,10 +1,18 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getCourses, getStudents, getAnnouncements, Announcement } from '../services/api';
 import '../styles/dashboard.css';
 
 function DashboardPage() {
   const [courseCount, setCourseCount] = useState(0);
   const [updates, setUpdates] = useState<Announcement[]>([]);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    navigate('/login');
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -71,6 +79,9 @@ function DashboardPage() {
               <h4>SULEIMANI MAULID MADENI</h4>
               <p className="profile-role">STUDENT</p>
               <p className="profile-programme">Bachelor of Science in Information Systems Management</p>
+              <button type="button" className="profile-logout-btn" onClick={handleLogout}>
+                Logout
+              </button>
             </div>
           </div>
         </div>
@@ -78,29 +89,20 @@ function DashboardPage() {
         {/* Registration Verification */}
         <div className="dashboard-card verification-card">
           <h3 className="card-title">REGISTRATION VERIFICATION</h3>
-          <div className="verification-timeline">
-            <div className="timeline-step completed">
-              <div className="timeline-dot"></div>
-              <div className="timeline-label">
-                <p className="timeline-title">BURSAR VERIFICATION (UNDERGRADUATE)</p>
-                <i className="fas fa-check"></i>
-              </div>
+          <div className="verification-steps">
+            <div className="v-step">
+              <div className="v-dot"><i className="fas fa-check"></i></div>
+              <p className="v-label">BURSAR VERIFICATION (UNDERGRADUATE)</p>
             </div>
-            <div className="timeline-connector"></div>
-            <div className="timeline-step completed">
-              <div className="timeline-dot"></div>
-              <div className="timeline-label">
-                <p className="timeline-title">HEAD OF DEPARTMENT VERIFICATION (UNDERGRADUATE)</p>
-                <i className="fas fa-check"></i>
-              </div>
+            <div className="v-line"></div>
+            <div className="v-step">
+              <div className="v-dot"><i className="fas fa-check"></i></div>
+              <p className="v-label">HEAD OF DEPARTMENT VERIFICATION (UNDERGRADUATE)</p>
             </div>
-            <div className="timeline-connector"></div>
-            <div className="timeline-step completed">
-              <div className="timeline-dot"></div>
-              <div className="timeline-label">
-                <p className="timeline-title">DIRECTOR OF UNDERGRADUATE PROGRAMS VERIFICATION</p>
-                <i className="fas fa-check"></i>
-              </div>
+            <div className="v-line"></div>
+            <div className="v-step">
+              <div className="v-dot"><i className="fas fa-check"></i></div>
+              <p className="v-label">DIRECTOR OF UNDERGRADUATE PROGRAMS VERIFICATION</p>
             </div>
           </div>
         </div>
