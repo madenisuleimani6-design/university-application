@@ -7,6 +7,7 @@ function LoginPage() {
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -60,7 +61,23 @@ function LoginPage() {
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Password</label>
-                  <input className="form-control" type="password" name="password" />
+                  <div className="position-relative">
+                    <input
+                      className="form-control pe-5"
+                      type={showPassword ? 'text' : 'password'}
+                      name="password"
+                      autoComplete="current-password"
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-link text-muted position-absolute top-50 end-0 translate-middle-y pe-3"
+                      onClick={() => setShowPassword(!showPassword)}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      tabIndex={-1}
+                    >
+                      <i className={`fas fa-eye${showPassword ? '-slash' : ''}`}></i>
+                    </button>
+                  </div>
                 </div>
                 <div className="form-check mb-3">
                   <input className="form-check-input" type="checkbox" id="remember" />
