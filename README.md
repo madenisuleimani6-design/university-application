@@ -36,11 +36,17 @@ This AMIS system consists of three main components:
 
 > **Note:** The Vite dev server runs on **HTTPS** at port **3002** using local
 > certificates from the `certs/` folder (gitignored). Regenerate them with
-> [mkcert](https://github.com/FiloSottile/mkcert) if missing:
+> [mkcert](https://github.com/FiloSottile/mkcert) if missing — pass **all** the
+> names you will visit, including the machine's current LAN IP
+> (find it with `ipconfig`):
 >
 > ```bash
-> mkcert -cert-file certs/vite-cert.pem -key-file certs/vite-key.pem localhost 127.0.0.1 ::1 192.168.1.4
+> mkcert -cert-file certs/vite-cert.pem -key-file certs/vite-key.pem localhost 127.0.0.1 ::1 192.168.1.8
 > ```
+
+> If a second device cannot reach the site, allow inbound TCP on 3002 and 8080
+> in Windows Defender Firewall (an elevated PowerShell command), and make sure
+> the machine keeps a stable IP (DHCP reservation on the router).
 
 ---
 
@@ -53,7 +59,7 @@ cd frontend
 npm run dev
 ```
 
-Visit: **https://localhost:3002** (or https://192.168.1.4:3002 on your LAN)
+Visit: **https://localhost:3002** (or `https://<your-lan-ip>:3002` on your LAN — see `ipconfig`)
 
 ### Option 2: Full Stack with Django Backend
 
