@@ -8,8 +8,11 @@ const apiBaseUrl = import.meta.env.VITE_API_URL ??
 const api = axios.create({ baseURL: apiBaseUrl });
 
 api.interceptors.request.use((config) => {
+  // A stale token on /auth/ endpoints makes DRF reject the request with 401
+  // before credentials are checked, so skip the header for login/register.
+  const isAuthEndpoint = config.url?.includes('/auth/');
   const token = localStorage.getItem('token');
-  if (token) {
+  if (token && !isAuthEndpoint) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
